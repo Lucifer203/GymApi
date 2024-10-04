@@ -1,6 +1,7 @@
-from pydantic import BaseModel,EmailStr
+from pydantic import BaseModel,EmailStr,Field
 from typing import Optional
-from datetime import datetime
+from datetime import datetime,date
+from typing import List
 
 
 class PlanBase(BaseModel):
@@ -23,6 +24,7 @@ class User(BaseModel):
 
 class UserCreate(BaseModel):
     email: EmailStr
+    password: str
     name: str
     age: int
     height: float  # Use float instead of double_precision
@@ -37,6 +39,44 @@ class UserOut(BaseModel):
     email: EmailStr
     enrolled_plan_id: int
     joined_at: datetime
+
+    class Config:
+        orm_mode = True
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    id: Optional[int] = None 
+
+
+## workout tracker schemas ###
+
+class WorkoutSetBase(BaseModel):
+    set_number: int
+    reps: int
+    weight: float
+
+class WorkoutSetCreate(WorkoutSetBase):
+    pass
+
+class WorkoutSet(WorkoutSetBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+class WorkoutBase(BaseModel):
+    exercise_name: str
+    workout_date: date = date.today()
+
+class WorkoutCreate(WorkoutBase):
+    sets: List[WorkoutSetCreate]
+
+class Workout(WorkoutBase):
+    id: int
+    sets: List[WorkoutSet]
 
     class Config:
         orm_mode = True
